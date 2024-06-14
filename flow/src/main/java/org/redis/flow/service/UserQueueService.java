@@ -29,9 +29,6 @@ public class UserQueueService {
 
     // 진입을 허용
     public Mono<Long> allowUser(final String queue, final Long count) {
-        // 진입을 허용하는 단계
-        // 1. wait queue 사용자를 제거
-        // 2. proceed queue 사용자를 추가
         var unixTimestamp = Instant.now().getEpochSecond();
         return reactiveRedisTemplate.opsForZSet().popMin(USER_QUEUE_WAIT_KEY.formatted(queue), count)
                 .flatMap(member -> reactiveRedisTemplate.opsForZSet().add(USER_QUEUE_PROCEED_KEY.formatted(queue), member.getValue(), unixTimestamp))
